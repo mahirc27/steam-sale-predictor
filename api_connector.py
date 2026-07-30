@@ -12,15 +12,14 @@ def get_game_id(game_title):
         "User-Agent": "SteamSalesPredictor/1.0 (mahirasifchowdhury@gmail.com)",
         "Content-Type": "application/json"
     }
-    payload = [game_title]
 
     try:
-        response = requests.post(endpoint, params={"key": API_KEY}, headers=headers, json=payload)
+        response = requests.get(endpoint, params={"key": API_KEY, "title": game_title}, headers=headers)
         response.raise_for_status()
         data = response.json()
 
-        if isinstance(data, list) and len(data) > 0 and data.get('found'):
-            return data[0]['game']['id']
+        if isinstance(data, dict) and data.get("found"):
+            return data['game']['id']
         else:
             print(f"Could not find game with title {game_title}")
             return None
@@ -41,3 +40,24 @@ def get_historical_low(game_id):
     except requests.exceptions.RequestException as e:
         print(f"Error fetching historical data: {e}")
         return None
+
+def main():
+    target_game = "Persona 4 Golden"
+    print(f"Searching game ID for: {target_game}...")
+
+    game_id = get_game_id(target_game)
+
+    if game_id:
+        print(f"Successfully found game ID: {game_id}")
+        print(f"Fetching historical low pricing data")
+
+        pricing_data = get_historical_low(game_id)
+        if pricing_data:
+            print("\n--- Historical Pricing Data ---")
+            print(json.dumps(pricing_data, indent=4))
+        else:
+            print(f"Failed to fetch historical pricing data for ID: {game_id}")
+    else:
+        print(f"Could not find game ID for {target_game}")
+if __name__ == "__main__":
+    main()
