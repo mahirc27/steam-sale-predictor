@@ -1,8 +1,12 @@
 import requests
 import json
 import uuid
+import os
+from dotenv import load_dotenv
 
-API_KEY = "API_KEY_HERE"
+load_dotenv()
+
+API_KEY = os.getenv("ITAD_API_KEY")
 BASE_URL = "https://api.isthereanydeal.com"
 COUNTRY_CODE = "US"
 
