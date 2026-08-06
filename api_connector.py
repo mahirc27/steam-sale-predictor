@@ -5,6 +5,7 @@ import os
 from dotenv import load_dotenv
 
 load_dotenv()
+from parser import parse_low_data
 
 API_KEY = os.getenv("ITAD_API_KEY")
 BASE_URL = "https://api.isthereanydeal.com"
@@ -59,6 +60,10 @@ def main():
         if pricing_data:
             print("\n--- Historical Pricing Data ---")
             print(json.dumps(pricing_data, indent=4))
+            parsed_result = parse_low_data(pricing_data)
+            print("\n--- Parsed Output (Ready for database) ---")
+            for record in parsed_result:
+                print(record)
         else:
             print(f"Failed to fetch historical pricing data for ID: {game_id}")
     else:
