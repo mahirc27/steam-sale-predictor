@@ -5,7 +5,7 @@ import os
 from dotenv import load_dotenv
 
 load_dotenv()
-from parser import parse_low_data
+from parser import parse_low_data, parse_price_history
 
 API_KEY = os.getenv("ITAD_API_KEY")
 BASE_URL = "https://api.isthereanydeal.com"
@@ -46,6 +46,26 @@ def get_historical_low(game_id):
         print(f"Error fetching historical data: {e}")
         return None
 
+def get_price_history(game_id):
+    endpoint = f'{BASE_URL}/games/history/v2'
+    headers = {
+        "User-Agent": "SteamSalesPredictor/1.0 (mahirasifchowdhury@gmail.com)",
+        "Content-Type": "application/json"
+    }
+    params = {
+        "key": API_KEY,
+        "country": COUNTRY_CODE,
+        "id": game_id
+    }
+
+    try:
+        response = requests.get(endpoint, params=params, headers=headers)
+        response.raise_for_status()
+        return response.json()
+    except requests.exceptions.RequestException as e:
+        print("Error fetching historical pricing data")
+        return None
+
 def main():
     target_game = "Persona 4 Golden"
     print(f"Searching game ID for: {target_game}...")
@@ -54,18 +74,26 @@ def main():
 
     if game_id:
         print(f"Successfully found game ID: {game_id}")
-        print(f"Fetching historical low pricing data")
 
-        pricing_data = get_historical_low(game_id)
-        if pricing_data:
-            print("\n--- Historical Pricing Data ---")
-            print(json.dumps(pricing_data, indent=4))
-            parsed_result = parse_low_data(pricing_data)
+        print(f"Fetching full time-series price history...")
+
+        history_data = get_price_history(game_id)
+        if history_data:
+            print("\n--- raw time series json ---")
+            if isinstance(history_data, list):
+                print(json.dumps(history_data[:3], indent=4))
+            else:
+                print(json.dumps(history_data, indent=4))
             print("\n--- Parsed Output (Ready for database) ---")
-            for record in parsed_result:
+
+            parsed_history = parse_price_history(history_data, game_id)
+
+            for record in parsed_history[:3]:
                 print(record)
+
+            print(f"\nExtracted {len(parsed_history)} records from {target_game}.")
         else:
-            print(f"Failed to fetch historical pricing data for ID: {game_id}")
+            print(f"Failed to fetch time-series data for ID: {game_id}")
     else:
         print(f"Could not find game ID for {target_game}")
 if __name__ == "__main__":
