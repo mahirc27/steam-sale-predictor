@@ -6,6 +6,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 from parser import parse_low_data, parse_price_history
+from db_loader import insert_price_history
 
 API_KEY = os.getenv("ITAD_API_KEY")
 BASE_URL = "https://api.isthereanydeal.com"
@@ -87,7 +88,7 @@ def main():
             print("\n--- Parsed Output (Ready for database) ---")
 
             parsed_history = parse_price_history(history_data, game_id)
-
+            insert_price_history(parsed_history)
             for record in parsed_history[:3]:
                 print(record)
 
