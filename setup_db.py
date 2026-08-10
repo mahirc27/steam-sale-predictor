@@ -27,7 +27,8 @@ def create_tables():
         regular_amount NUMERIC(10, 2),
         currency VARCHAR(10),
         discount INTEGER,
-        timestamp TIMESTAMP WITH TIME ZONE
+        timestamp DATE NOT NULL,
+        CONSTRAINT unique_game_event UNIQUE (shop_id, game_id, timestamp)
     );
     """
     print("Connecting to Neon PostgreSQL...")

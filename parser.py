@@ -17,7 +17,7 @@ def parse_low_data(raw_data: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
 
         raw_time = low_data.get("timestamp")
 
-        parsed_time = datetime.fromisoformat(raw_time) if raw_time else None
+        parsed_time = datetime.fromisoformat(raw_time.split('T')[0]) if raw_time else None
 
         record = {
             'game_id': game_id,

@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 from parser import parse_low_data, parse_price_history
-from db_loader import insert_price_history
+from db_loader import insert_price_history, insert_game_summary
 
 API_KEY = os.getenv("ITAD_API_KEY")
 BASE_URL = "https://api.isthereanydeal.com"
@@ -78,6 +78,7 @@ def main():
 
         print(f"Fetching full time-series price history...")
 
+        low_data = get_historical_low(game_id)
         history_data = get_price_history(game_id)
         if history_data:
             print("\n--- raw time series json ---")
@@ -91,6 +92,9 @@ def main():
             insert_price_history(parsed_history)
             for record in parsed_history[:3]:
                 print(record)
+        if low_data:
+            parsed_summary = parse_low_data(low_data)
+            insert_game_summary(parsed_summary[0])
 
             print(f"\nExtracted {len(parsed_history)} records from {target_game}.")
         else:
