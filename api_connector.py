@@ -56,7 +56,8 @@ def get_price_history(game_id):
     params = {
         "key": API_KEY,
         "country": COUNTRY_CODE,
-        "id": game_id
+        "id": game_id,
+        "since": "2010-01-01T00:00:00Z",
     }
 
     try:

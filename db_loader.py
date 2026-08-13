@@ -14,7 +14,9 @@ def insert_price_history(parsed_records):
     sql_command = """
     INSERT INTO price_history
     (game_id, shop_id, shop_name, price_amount, regular_amount, currency, discount, timestamp)
-    VALUES (%s, %s, %s, %s, %s, %s, %s, %s);
+    VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+    ON CONFLICT (game_id, shop_id, timestamp)
+    DO NOTHING;
     """
     print(f"Preparing to insert {len(parsed_records)} records.")
 
@@ -63,7 +65,7 @@ def insert_game_summary(record):
         regular_amount = EXCLUDED.regular_amount,
         currency = EXCLUDED.currency,
         discount = EXCLUDED.discount,
-        timestamp = EXCLUDED.timestamp
+        timestamp = EXCLUDED.timestamp;
     """
 
     try:
